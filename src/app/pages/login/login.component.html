@@ -1,0 +1,85 @@
+<div class="login-wrapper">
+  <div class="login-container card">
+    
+    <!-- Botão de Toggle de Tema -->
+    <div class="login-theme-toggle">
+      <button 
+        type="button" 
+        class="btn-nav-theme" 
+        (click)="themeService.toggleTheme()"
+        [title]="themeService.isDarkMode() ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'">
+        <span>{{ themeService.isDarkMode() ? '☀️' : '🌙' }}</span>
+      </button>
+    </div>
+
+    <!-- Cabeçalho -->
+    <div class="login-header">
+      <div class="brand-logo">
+        <span class="logo-icon">💼</span>
+      </div>
+      <h2>Portal de Recrutamento</h2>
+      <p>Insira suas credenciais para acessar a plataforma</p>
+    </div>
+
+    <!-- MENSAGEM DE ERRO VISÍVEL -->
+    @if (mensagemErro) {
+      <div class="alert alert-danger" role="alert">
+        <span class="alert-icon">⚠️</span>
+        <span>{{ mensagemErro }}</span>
+      </div>
+    }
+
+    <!-- Formulário -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      
+      <div class="form-group">
+        <label for="email">E-mail Corporativo</label>
+        <div class="input-wrapper">
+          <span class="input-icon">✉️</span>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email" 
+            placeholder="seu.email@empresa.com" 
+            class="form-control"
+            [class.is-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" />
+        </div>
+        @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+          <small class="error-text">Informe um e-mail válido.</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input 
+            type="password" 
+            id="senha" 
+            formControlName="senha" 
+            placeholder="••••••••" 
+            class="form-control"
+            [class.is-invalid]="loginForm.get('senha')?.invalid && loginForm.get('senha')?.touched" />
+        </div>
+        @if (loginForm.get('senha')?.invalid && loginForm.get('senha')?.touched) {
+          <small class="error-text">A senha é obrigatória.</small>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-submit" [disabled]="loading">
+        @if (loading) {
+          <span class="spinner"></span>
+          <span>Entrando...</span>
+        } @else {
+          <span>Entrar no Sistema</span>
+        }
+      </button>
+
+    </form>
+
+    <div class="login-footer">
+      <p>© 2026 Sistema de Recrutamento Interno</p>
+    </div>
+
+  </div>
+</div>

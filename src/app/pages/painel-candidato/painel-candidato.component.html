@@ -1,0 +1,92 @@
+<header class="navbar">
+  <div class="container nav-container">
+    <a class="logo-brand" (click)="router.navigate(['/vagas'])" style="cursor: pointer;">
+      <span class="brand-icon">💼</span>
+      <span>Recrutamento Interno</span>
+      <span class="brand-tag">Candidato</span>
+    </a>
+    <div class="user-info">
+      <div class="user-badge">
+        <span class="user-avatar">{{ userName ? userName.charAt(0).toUpperCase() : 'U' }}</span>
+        <span>Olá, <strong>{{ userName }}</strong></span>
+      </div>
+      <div class="nav-actions">
+        <button type="button" class="btn-nav btn-nav-outline" (click)="router.navigate(['/vagas'])">
+          🔍 Ver Vagas
+        </button>
+        <button type="button" class="btn-nav btn-nav-outline theme-toggle-btn" (click)="themeService.toggleTheme()"
+          [title]="themeService.isDarkMode() ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'">
+          <span>{{ themeService.isDarkMode() ? '☀️' : '🌙' }}</span>
+        </button>
+        <button type="button" class="btn-nav btn-nav-danger" (click)="logout()">
+          🚪 Sair
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+<main class="container">
+  <div class="page-header">
+    <div>
+      <h2>Painel do Candidato</h2>
+      <p>Acompanhe o andamento das suas candidaturas e o retorno do RH.</p>
+    </div>
+  </div>
+  @if (mensagemErro) {
+  <div class="alert alert-danger">{{ mensagemErro }}</div>
+  }
+  @if (loading) {
+  <div class="text-center loading-box">
+    <p>Carregando histórico...</p>
+  </div>
+  } @else {
+  @if (candidaturas.length > 0) {
+  <div class="cards-grid">
+    @for (c of candidaturas; track c.id) {
+    <div class="card candidatura-card">
+      <div class="card-header-vaga">
+        <h3 class="vaga-titulo" [title]="c.vagaTitulo || ('Vaga #' + c.vagaId)">
+          {{ c.vagaTitulo || ('Vaga #' + c.vagaId) }}
+        </h3>
+        <span class="badge" [ngClass]="{
+                'badge-pending': c.status === 'RECEBIDA' || c.status === 'EM_ANALISE',
+                'badge-open': c.status === 'APROVADO',
+                'badge-rejected': c.status === 'REJEITADO'
+              }">
+          {{ c.status }}
+        </span>
+      </div>
+      <div class="card-body-vaga">
+        <p class="data-aplicacao">
+          <span>Data da Inscrição: </span>
+          <strong>{{ c.dataAplicacao | date:'dd/MM/yyyy' }}</strong>
+        </p>
+        <div class="feedback-box">
+          <span class="feedback-label">Feedback do RH</span>
+          <div class="feedback-content">
+            @if (c.feedback) {
+            <p class="feedback-text">"{{ c.feedback }}"</p>
+            } @else {
+            <p class="feedback-empty">Nenhum feedback registrado até o momento.</p>
+            }
+          </div>
+          @if (c.notaAvaliacao !== null && c.notaAvaliacao !== undefined) {
+          <div class="nota-row">
+            <span>Nota da Avaliação:</span>
+            <span class="nota-pill">{{ c.notaAvaliacao }} / 10</span>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  } @else {
+  <div class="empty-state card">
+    <h3>Você ainda não se candidatou a nenhuma vaga.</h3>
+    <p>Navegue até a lista de vagas abertas e inscreva-se nas oportunidades do seu interesse!</p>
+    <button class="btn btn-primary" (click)="router.navigate(['/vagas'])">Ir para Vagas</button>
+  </div>
+  }
+  }
+</main>

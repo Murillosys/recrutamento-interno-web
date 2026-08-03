@@ -1,0 +1,227 @@
+<header class="navbar">
+    <div class="container nav-container">
+        <a class="logo-brand">
+            <span class="brand-icon">💼</span>
+            <span>Painel do RH</span>
+            <span class="brand-tag">Triagem</span>
+        </a>
+
+        <div class="user-info">
+            <div class="user-badge">
+                <span class="user-avatar">{{ userName ? userName.charAt(0).toUpperCase() : 'R' }}</span>
+                <span>Olá, <strong>{{ userName }}</strong></span>
+            </div>
+
+            <div class="nav-actions">
+                <button type="button" class="btn-nav btn-nav-outline" (click)="router.navigate(['/vagas'])">
+                    📋 Vagas
+                </button>
+                <button type="button" class="btn-nav btn-nav-outline theme-toggle-btn"
+                    (click)="themeService.toggleTheme()"
+                    [title]="themeService.isDarkMode() ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'">
+                    <span>{{ themeService.isDarkMode() ? '☀️' : '🌙' }}</span>
+                </button>
+                <button type="button" class="btn-nav btn-nav-danger" (click)="logout()">
+                    🚪 Sair
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+    <div class="page-header">
+        <h2>Avaliação e Triagem de Candidatos</h2>
+        <p>Filtre e avalie as candidaturas submetidas pelos colaboradores da empresa.</p>
+    </div>
+
+    @if (mensagemSucesso) {
+    <div class="alert alert-success">{{ mensagemSucesso }}</div>
+    }
+
+    @if (mensagemErro) {
+    <div class="alert alert-danger">{{ mensagemErro }}</div>
+    }
+
+    <div class="filter-panel card">
+        <div class="filter-grid">
+
+            <div class="filter-field">
+                <label for="vagaSelect"><i class="icon">💼</i> Filtrar por Vaga</label>
+                <select id="vagaSelect" class="custom-select"
+                    [ngModel]="vagaSelecionadaId !== null ? vagaSelecionadaId : 'null'"
+                    (ngModelChange)="selecionarVaga($event)">
+                    <option value="null">-- Todas as Vagas --</option>
+                    @for (v of vagas; track v.id) {
+                    <option [value]="v.id">
+                        {{ v.titulo }} ({{ v.status }})
+                    </option>
+                    }
+                </select>
+            </div>
+
+            <div class="filter-field">
+                <label for="buscaCandidato"><i class="icon">🔍</i> Buscar Candidato</label>
+                <input type="text" id="buscaCandidato" [(ngModel)]="filtroCandidatoText" placeholder="Nome ou e-mail..."
+                    class="custom-input" />
+            </div>
+
+            <div class="filter-field">
+                <label for="statusFilter"><i class="icon">📌</i> Status da Candidatura</label>
+                <select id="statusFilter" class="custom-select" [(ngModel)]="filtroStatusSelecionado">
+                    <option value="TODOS">-- Todos os Status --</option>
+                    <option value="RECEBIDA">Recebida</option>
+                    <option value="EM_ANALISE">Em Análise</option>
+                    <option value="APROVADO">Aprovado</option>
+                    <option value="REJEITADO">Rejeitado</option>
+                </select>
+            </div>
+
+            @if (vagaSelecionadaId !== null || filtroCandidatoText.trim() !== '' || filtroStatusSelecionado !== 'TODOS')
+            {
+            <div class="filter-actions">
+                <button type="button" class="btn btn-outline btn-reset" (click)="limparTodosFiltros()">
+                    🧹 Limpar Filtros
+                </button>
+            </div>
+            }
+        </div>
+    </div>
+
+    @if (loading) {
+    <div class="text-center loading-box">
+        <p>Carregando candidaturas...</p>
+    </div>
+    } @else {
+    @if (vagasFiltradasComCandidatos.length > 0) {
+    @for (item of vagasFiltradasComCandidatos; track item.vaga.id) {
+    <div class="card vaga-candidatos-card">
+
+        <div class="vaga-card-header">
+            <div>
+                <h3>📌 {{ item.vaga.titulo }}</h3>
+                <p class="vaga-requisitos">
+                    <strong>Requisitos:</strong> {{ item.vaga.requisitos || 'Não informados' }}
+                </p>
+            </div>
+            <span class="badge" [ngClass]="item.vaga.status === 'ABERTA' ? 'badge-open' : 'badge-closed'">
+                {{ item.vaga.status }}
+            </span>
+        </div>
+
+        <div class="table-container">
+            <table class="responsive-table">
+                <colgroup class="desktop-only">
+                    <col style="width: 25%;">
+                    <col style="width: 15%;">
+                    <col style="width: 15%;">
+                    <col style="width: 10%;">
+                    <col style="width: 20%;">
+                    <col style="width: 15%;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>Candidato</th>
+                        <th>Data de Inscrição</th>
+                        <th>Status Atual</th>
+                        <th>Nota</th>
+                        <th>Feedback</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (c of item.candidaturas; track c.id) {
+                    <tr>
+                        <td data-label="Candidato" class="col-candidato">
+                            <strong class="candidato-nome">{{ c.candidatoNome }}</strong>
+                            @if (c.candidatoEmail) {
+                            <br><small class="text-muted">{{ c.candidatoEmail }}</small>
+                            }
+                        </td>
+                        <td data-label="Data de Inscrição">
+                            {{ c.dataAplicacao | date:'dd/MM/yyyy' }}
+                        </td>
+                        <td data-label="Status Atual">
+                            <span class="badge" [ngClass]="{
+              'badge-pending': c.status === 'RECEBIDA' || c.status === 'EM_ANALISE',
+              'badge-open': c.status === 'APROVADO',
+              'badge-rejected': c.status === 'REJEITADO'
+            }">{{ c.status }}</span>
+                        </td>
+                        <td data-label="Nota">
+                            {{ c.notaAvaliacao !== null && c.notaAvaliacao !== undefined ? c.notaAvaliacao + ' / 10' :
+                            '-' }}
+                        </td>
+                        <td data-label="Feedback" class="feedback-col">
+                            {{ c.feedback || 'Sem feedback' }}
+                        </td>
+                        <td data-label="Ações" class="col-acoes">
+                            <button class="btn btn-sm btn-primary btn-block-mobile" (click)="abrirModalAvaliacao(c)">
+                                Avaliar
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    }
+    } @else {
+    <div class="empty-state card">
+        <h3>Nenhum candidato encontrado</h3>
+        <p>Não foram encontradas candidaturas para os filtros selecionados.</p>
+    </div>
+    }
+    }
+</main>
+
+@if (mostrarModalAvaliacao) {
+<div class="modal-backdrop">
+    <div class="modal-content card">
+        <h3>Avaliar Candidato: {{ candidaturaEmEdicao?.candidatoNome }}</h3>
+
+        <form [formGroup]="avaliacaoForm" (ngSubmit)="salvarAvaliacao()">
+            <div class="form-group">
+                <label for="status">Etapa / Status do Processo</label>
+                <select id="status" formControlName="status">
+                    <option value="RECEBIDA">Recebida</option>
+                    <option value="EM_ANALISE">Em Análise</option>
+                    <option value="APROVADO">Aprovado</option>
+                    <option value="REJEITADO">Rejeitado</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="notaAvaliacao">Nota de Avaliação (1 a 10)</label>
+                <input type="number" id="notaAvaliacao" formControlName="notaAvaliacao" min="1" max="10"
+                    placeholder="Ex: 8">
+            </div>
+
+            <div class="form-group">
+                <label for="feedback">Feedback para o Colaborador</label>
+                <textarea id="feedback" formControlName="feedback" rows="3"
+                    placeholder="Escreva um parecer motivacional ou pontos de melhoria..."></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" (click)="fecharModal()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar Feedback</button>
+            </div>
+        </form>
+    </div>
+</div>
+}
+
+@if (mostrarDialogErroNota) {
+<div class="modal-backdrop" style="z-index: 11000;">
+    <div class="modal-content card text-center modal-feedback">
+        <div class="feedback-icon">⚠️</div>
+        <h3>Nota Inválida</h3>
+        <p>A nota de avaliação deve ser um valor <strong>entre 1 e 10</strong>.</p>
+        <div class="modal-actions-center">
+            <button type="button" class="btn btn-primary" (click)="fecharDialogErroNota()">OK, entendi</button>
+        </div>
+    </div>
+</div>
+}
