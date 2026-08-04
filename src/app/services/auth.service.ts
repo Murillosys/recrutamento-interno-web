@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { API_ENDPOINTS } from '../core/config/api-endpoints';
 
 export interface LoginResponse {
   token: string;
@@ -14,12 +15,10 @@ export interface LoginResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/auth';
-
   constructor(private http: HttpClient) {}
 
   login(credentials: { email: string; senha: string }): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
+    return this.http.post<LoginResponse>(API_ENDPOINTS.auth.login, credentials).pipe(
       tap((res) => {
         if (res && res.token) {
           localStorage.setItem('auth_token', res.token);

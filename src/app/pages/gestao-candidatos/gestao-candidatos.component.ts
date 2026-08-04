@@ -9,6 +9,7 @@ import { AuthService } from '../../services/auth.service';
 import { Candidatura } from '../../core/models/candidatura.model';
 import { Vaga } from '../../core/models/vaga.model';
 import { ThemeService } from '../../core/services/theme.service';
+import { HeaderComponent } from '../../shared/components/header/header.component';
 
 export interface VagaComCandidatos {
   vaga: Vaga;
@@ -18,7 +19,7 @@ export interface VagaComCandidatos {
 @Component({
   selector: 'app-gestao-candidatos',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, HeaderComponent],
   templateUrl: './gestao-candidatos.component.html',
   styleUrls: ['./gestao-candidatos.component.scss']
 })

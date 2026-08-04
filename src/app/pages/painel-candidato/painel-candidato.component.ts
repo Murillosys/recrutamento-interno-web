@@ -5,11 +5,12 @@ import { CandidaturaService } from '../../services/candidatura.service';
 import { AuthService } from '../../services/auth.service';
 import { Candidatura } from '../../core/models/candidatura.model';
 import { ThemeService } from '../../core/services/theme.service';
+import { HeaderComponent } from '../../shared/components/header/header.component';
 
 @Component({
     selector: 'app-painel-candidato',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, HeaderComponent],
     templateUrl: './painel-candidato.component.html',
     styleUrls: ['./painel-candidato.component.scss']
 })

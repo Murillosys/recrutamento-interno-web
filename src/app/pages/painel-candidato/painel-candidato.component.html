@@ -1,30 +1,10 @@
-<header class="navbar">
-  <div class="container nav-container">
-    <a class="logo-brand" (click)="router.navigate(['/vagas'])" style="cursor: pointer;">
-      <span class="brand-icon">💼</span>
-      <span>Recrutamento Interno</span>
-      <span class="brand-tag">Candidato</span>
-    </a>
-    <div class="user-info">
-      <div class="user-badge">
-        <span class="user-avatar">{{ userName ? userName.charAt(0).toUpperCase() : 'U' }}</span>
-        <span>Olá, <strong>{{ userName }}</strong></span>
-      </div>
-      <div class="nav-actions">
-        <button type="button" class="btn-nav btn-nav-outline" (click)="router.navigate(['/vagas'])">
-          🔍 Ver Vagas
-        </button>
-        <button type="button" class="btn-nav btn-nav-outline theme-toggle-btn" (click)="themeService.toggleTheme()"
-          [title]="themeService.isDarkMode() ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'">
-          <span>{{ themeService.isDarkMode() ? '☀️' : '🌙' }}</span>
-        </button>
-        <button type="button" class="btn-nav btn-nav-danger" (click)="logout()">
-          🚪 Sair
-        </button>
-      </div>
-    </div>
-  </div>
-</header>
+<app-header
+  title="Recrutamento Interno"
+  tag="Candidato"
+  quickLinkIcon="🔍"
+  quickLinkLabel="Ver Vagas"
+  quickLinkRoute="/vagas">
+</app-header>
 <main class="container">
   <div class="page-header">
     <div>

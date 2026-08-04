@@ -1,38 +1,12 @@
-<header class="navbar navbar-fixed">
-  <div class="container nav-container">
-    <a class="logo-brand" (click)="router.navigate(['/vagas'])" style="cursor: pointer;">
-      <span class="brand-icon">💼</span>
-      <span class="brand-text">Painel de Vagas</span>
-      <span class="brand-tag">Vagas</span>
-    </a>
-    <div class="user-info">
-      <div class="user-badge">
-        <span class="user-avatar">{{ userName ? userName.charAt(0).toUpperCase() : 'U' }}</span>
-        <span>Olá, <strong>{{ userName }}</strong></span>
-      </div>
-      <div class="nav-actions">
-        @if (isAdmin) {
-          <button type="button" class="btn-nav btn-nav-outline" (click)="router.navigate(['/gestao-candidatos'])" title="Gestão de Candidatos">
-            👥 Triagem
-          </button>
-        } @else {
-          <button type="button" class="btn-nav btn-nav-outline" (click)="router.navigate(['/painel-candidato'])" title="Minhas Candidaturas">
-            📌 Minhas
-          </button>
-        }
-        <button type="button" class="btn-nav btn-nav-outline theme-toggle-btn" (click)="themeService.toggleTheme()"
-          [title]="themeService.isDarkMode() ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'">
-          <span>{{ themeService.isDarkMode() ? '☀️' : '🌙' }}</span>
-        </button>
-        <button type="button" class="btn-nav btn-nav-danger" (click)="logout()" title="Sair">
-          🚪 Sair
-        </button>
-      </div>
-    </div>
-  </div>
-</header>
+<app-header
+  title="Painel de Vagas"
+  tag="Vagas"
+  [quickLinkIcon]="isAdmin ? '👥' : '📌'"
+  [quickLinkLabel]="isAdmin ? 'Triagem' : 'Minhas'"
+  [quickLinkRoute]="isAdmin ? '/gestao-candidatos' : '/painel-candidato'">
+</app-header>
 
-<main class="container page-content-with-navbar">
+<main class="container">
   <div class="page-header">
     <div>
       <h2>Vagas Abertas</h2>

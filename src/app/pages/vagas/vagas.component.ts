@@ -2,17 +2,18 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { VagaService } from '../../services/vaga.service';
 import { AuthService } from '../../services/auth.service';
+import { CandidaturaService } from '../../services/candidatura.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { Vaga } from '../../core/models/vaga.model';
+import { HeaderComponent } from '../../shared/components/header/header.component';
 
 @Component({
   selector: 'app-vagas',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, HeaderComponent],
   templateUrl: './vagas.component.html',
   styleUrls: ['./vagas.component.scss']
 })
@@ -41,7 +42,7 @@ export class VagasComponent implements OnInit {
     private fb: FormBuilder,
     private vagaService: VagaService,
     private authService: AuthService,
-    private http: HttpClient,
+    private candidaturaService: CandidaturaService,
     public router: Router,
     public themeService: ThemeService,
     private cdr: ChangeDetectorRef
@@ -51,16 +52,6 @@ export class VagasComponent implements OnInit {
       descricao: ['', Validators.required],
       requisitos: ['', Validators.required]
     });
-  }
-
-  private getAuthOptions() {
-    const token = this.authService.getToken();
-    return {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : ''
-      })
-    };
   }
 
   ngOnInit(): void {
@@ -73,9 +64,7 @@ export class VagasComponent implements OnInit {
   }
 
   carregarMinhasCandidaturas(): void {
-    const token = this.authService.getToken();
-    if (!token) return;
-    this.http.get<any[]>('http://localhost:8080/candidaturas/minhas', this.getAuthOptions()).subscribe({
+    this.candidaturaService.listarMinhasCandidaturas().subscribe({
       next: (candidaturas) => {
         if (candidaturas && Array.isArray(candidaturas)) {
           this.candidaturasUsuario = candidaturas.map(c => c.vagaId);

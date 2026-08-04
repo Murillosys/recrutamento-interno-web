@@ -1,0 +1,33 @@
+<header class="navbar app-header">
+  <div class="container nav-container">
+    <a class="logo-brand" (click)="navigateBrand()">
+      <span class="brand-icon">{{ brandIcon }}</span>
+      <span>{{ title }}</span>
+      @if (tag) {
+        <span class="brand-tag">{{ tag }}</span>
+      }
+    </a>
+
+    <div class="user-info">
+      <div class="user-badge">
+        <span class="user-avatar">{{ avatarLetter }}</span>
+        <span>Olá, <strong>{{ userName }}</strong></span>
+      </div>
+
+      <div class="nav-actions">
+        @if (quickLinkRoute) {
+          <button type="button" class="btn-nav btn-nav-outline" (click)="navigateQuickLink()" [title]="quickLinkLabel">
+            {{ quickLinkIcon }} {{ quickLinkLabel }}
+          </button>
+        }
+        <button type="button" class="btn-nav btn-nav-outline theme-toggle-btn" (click)="themeService.toggleTheme()"
+          [title]="themeService.isDarkMode() ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'">
+          <span>{{ themeService.isDarkMode() ? '☀️' : '🌙' }}</span>
+        </button>
+        <button type="button" class="btn-nav btn-nav-danger" (click)="logout()" title="Sair">
+          🚪 Sair
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
