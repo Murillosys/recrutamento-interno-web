@@ -53,11 +53,12 @@ export class VagasComponent implements OnInit {
     });
   }
 
-  private getAuthHeaders(): { headers: HttpHeaders } {
+  private getAuthOptions() {
     const token = this.authService.getToken();
     return {
       headers: new HttpHeaders({
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
       })
     };
   }
@@ -66,21 +67,24 @@ export class VagasComponent implements OnInit {
     this.isAdmin = this.authService.isAdmin();
     this.userName = this.authService.getNome();
     this.carregarVagas();
-
-    if (!this.isAdmin) {
+    if (this.authService.isLoggedIn()) {
       this.carregarMinhasCandidaturas();
     }
   }
 
   carregarMinhasCandidaturas(): void {
-    this.http.get<any[]>('http://localhost:8080/candidaturas/minhas', this.getAuthHeaders()).subscribe({
+    const token = this.authService.getToken();
+    if (!token) return;
+    this.http.get<any[]>('http://localhost:8080/candidaturas/minhas', this.getAuthOptions()).subscribe({
       next: (candidaturas) => {
         if (candidaturas && Array.isArray(candidaturas)) {
           this.candidaturasUsuario = candidaturas.map(c => c.vagaId);
           this.cdr.detectChanges();
         }
       },
-      error: (err) => console.error('Erro ao carregar minhas candidaturas:', err)
+      error: (err) => {
+        console.error('Erro ao carregar minhas candidaturas:', err);
+      }
     });
   }
 
@@ -172,7 +176,6 @@ export class VagasComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  
   abrirModalEncerrar(vagaId: number | undefined): void {
     if (!vagaId) return;
     this.vagaParaEncerrarId = vagaId;
@@ -201,7 +204,6 @@ export class VagasComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
- 
   jaCandidatado(vagaId: number | undefined): boolean {
     if (!vagaId) return false;
     return this.candidaturasUsuario.includes(vagaId);
